@@ -1,55 +1,49 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import Form from "./components/Form";
 import List from "./components/List";
 import Navbar from "./components/Navbar";
+import taskReducer from "./components/taskReducer";
 
 export default function App() {
-  const [tasks, setTasks] = useState(
-    initialTasks === null ? [] : JSON.parse(initialTasks)
-  );
+  const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
   const ref = useRef(null);
   const previousLengthRef = useRef(tasks.length);
 
   useEffect(() => {
-    // Scroll to the bottom only if a new item is added
     if (tasks.length > previousLengthRef.current) {
       if (ref.current) {
         ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     }
-    // Update the previous length reference
     previousLengthRef.current = tasks.length;
   }, [tasks]);
+
   const deleteTask = (item) => {
-    const newList = tasks.filter((x) => x.id !== item.id);
-    setTasks(newList);
-    localStorage.setItem("tasks", JSON.stringify(newList));
+    dispatch({
+      type: "deleted",
+      id: item.id,
+    });
   };
 
   const handleDone = (item) => {
-    const newList = tasks.map((x) => {
-      if (x.id === item.id) {
-        return { ...x, status: "done" };
-      } else {
-        return x;
-      }
+    dispatch({
+      type: "status_changed",
+      id:item.id,
     });
-    setTasks(newList);
-    localStorage.setItem("tasks", JSON.stringify(newList));
   };
 
   const addTask = (item) => {
-    const id =
-      tasks.length === 0 ? 0 : tasks[tasks.length - 1].id + 1;
-    const newList = [...tasks, { ...item,id }];
-    setTasks(newList);
-    localStorage.setItem("tasks", JSON.stringify(newList));
+    dispatch({
+      type: "added",
+      task: item,
+    });
   };
 
   const editTask = (item) => {
-    const newList = tasks.map((x) => (x.id === item.id ? item : x));
-    setTasks(newList);
-    localStorage.setItem("tasks", JSON.stringify(newList));
+    dispatch({
+      type: "updated",
+      task: item,
+    });
   };
 
   return (
@@ -73,4 +67,7 @@ export default function App() {
   );
 }
 
-let initialTasks = localStorage.getItem("tasks");
+let initialTasks =
+  localStorage.getItem("tasks") === null
+    ? []
+    : JSON.parse(localStorage.getItem("tasks"));

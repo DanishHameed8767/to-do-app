@@ -5,7 +5,7 @@ export default function Form({ addTask }) {
   const [fields, setFields] = useState({
     title: "",
     description: "",
-    status: "pending",
+    status: false,
   });
 
   const handleChange = (e) => {
@@ -17,8 +17,14 @@ export default function Form({ addTask }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("submitted");
-    addTask(fields);
+    if (fields.title.length > 0 && fields.description.length > 0) {
+      addTask(fields);
+      setFields({
+        title: "",
+        description: "",
+        status: false,
+      });
+    }
   };
   return (
     <>
