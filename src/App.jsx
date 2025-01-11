@@ -1,12 +1,25 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Form from "./components/Form";
 import List from "./components/List";
+import Navbar from "./components/Navbar";
 
 export default function App() {
   const [tasks, setTasks] = useState(
     initialTasks === null ? [] : JSON.parse(initialTasks)
   );
+  const ref = useRef(null);
+  const previousLengthRef = useRef(tasks.length);
 
+  useEffect(() => {
+    // Scroll to the bottom only if a new item is added
+    if (tasks.length > previousLengthRef.current) {
+      if (ref.current) {
+        ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+    // Update the previous length reference
+    previousLengthRef.current = tasks.length;
+  }, [tasks]);
   const deleteTask = (item) => {
     const newList = tasks.filter((x) => x.id !== item.id);
     setTasks(newList);
@@ -26,7 +39,9 @@ export default function App() {
   };
 
   const addTask = (item) => {
-    const newList = [...tasks, { ...item, id: tasks.length }];
+    const id =
+      tasks.length === 0 ? 0 : tasks[tasks.length - 1].id + 1;
+    const newList = [...tasks, { ...item,id }];
     setTasks(newList);
     localStorage.setItem("tasks", JSON.stringify(newList));
   };
@@ -39,6 +54,7 @@ export default function App() {
 
   return (
     <>
+      <Navbar />
       <div className="container mt-3">
         <h1>Add Task</h1>
         <Form addTask={addTask} />
@@ -52,35 +68,9 @@ export default function App() {
           editTask={editTask}
         />
       </div>
+      <div id="scroll-elem" ref={ref}></div>
     </>
   );
 }
-
-let ini = [
-  {
-    id: 0,
-    title: "React",
-    description: "Learn react concepts",
-    status: "pending",
-  },
-  {
-    id: 1,
-    title: "MySQL",
-    description: "Learn MySQL concepts",
-    status: "pending",
-  },
-  {
-    id: 2,
-    title: "Nodejs",
-    description: "Learn nodejs concepts",
-    status: "pending",
-  },
-  {
-    id: 3,
-    title: "C Sharp",
-    description: "Learn C# concepts",
-    status: "pending",
-  },
-];
 
 let initialTasks = localStorage.getItem("tasks");

@@ -10,42 +10,41 @@ export default function ListItem({
 }) {
   return (
     <>
-      <li className="card col-5">
+      <li className="card col-md-5">
         <div className="card-body">
-          <h5 className="card-title">{title}</h5>
-          <p className="card-text">{description}</p>
-          <button
-            className={`btn btn-primary ${
-              taskStatus === "done" ? "disabled" : ""
-            }`}
-            onClick={handleDone}
-          >
-            Mark as done
-          </button>
-          <button className="btn btn-outline-danger ms-3" onClick={deleteTask}>
-            Delete
-          </button>
-          <button
-            className="btn btn-outline-success ms-3"
-            onClick={editTask}
-            data-bs-toggle="modal"
-            data-bs-target="#editModal"
-          >
-            Edit
-          </button>
-          <span className="ms-3 text-danger">{taskStatus}</span>
+          <h5 className="card-title">
+            {taskStatus === "done" ? <strike>{title}</strike> : title}
+          </h5>
+          <p className="card-text">
+            {taskStatus === "done" ? (
+              <strike>{description}</strike>
+            ) : (
+              description
+            )}
+          </p>
+          <div className="d-flex gap-3 flex-wrap">
+            <button
+              className={`btn btn-primary ${
+                taskStatus === "done" ? "disabled" : ""
+              }`}
+              onClick={handleDone}
+            >
+              Mark as done
+            </button>
+            <button className="btn btn-outline-danger" onClick={deleteTask}>
+              Delete
+            </button>
+            <button
+              className="btn btn-outline-success"
+              onClick={editTask}
+              data-bs-toggle="modal"
+              data-bs-target="#editModal"
+            >
+              Edit
+            </button>
+            <span className="text-danger">{taskStatus}</span>
+          </div>
         </div>
-        <>
-          {/* Button trigger modal */}
-          {/* <button
-            type="button"
-            className="btn btn-primary"
-            
-          >
-            Launch demo modal
-          </button> */}
-          
-        </>
       </li>
     </>
   );
